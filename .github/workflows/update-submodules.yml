@@ -1,0 +1,42 @@
+name: Update submodules
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Update submodules
+        run: |
+          git submodule foreach --recursive '
+            git fetch origin
+            git checkout $(git symbolic-ref --short HEAD)
+            git pull origin $(git symbolic-ref --short HEAD)
+          '
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No hay cambios en los submodulos."
+          else
+            git add .
+            git commit -m "chore: actualizar submodulos"
+            git push
+          fi
