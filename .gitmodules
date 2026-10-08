@@ -1,12 +1,12 @@
-[submodule "Fase 2/Evidencias Grupales/repos/billing"]
-	path = Fase 2/Evidencias Grupales/repos/billing
+[submodule "Fase 2/Evidencias Proyecto/repos/billing"]
+	path = Fase 2/Evidencias Proyecto/repos/billing
 	url = git@github-trabajo:nickosevilla/billing-microservice.git
-[submodule "Fase 2/Evidencias Grupales/repos/tenants"]
-	path = Fase 2/Evidencias Grupales/repos/tenants
+[submodule "Fase 2/Evidencias Proyecto/repos/tenants"]
+	path = Fase 2/Evidencias Proyecto/repos/tenants
 	url = https://github.com/DQAphex/TenantsMicroservice.git
-[submodule "Fase 2/Evidencias Grupales/repos/iam-service"]
-	path = Fase 2/Evidencias Grupales/repos/iam-service
+[submodule "Fase 2/Evidencias Proyecto/repos/iam-service"]
+	path = Fase 2/Evidencias Proyecto/repos/iam-service
 	url = https://github.com/iDenyss/iam-service.git
-[submodule "Fase 2/Evidencias Grupales/repos/plataforma-backend"]
-	path = Fase 2/Evidencias Grupales/repos/plataforma-backend
+[submodule "Fase 2/Evidencias Proyecto/repos/plataforma-backend"]
+	path = Fase 2/Evidencias Proyecto/repos/plataforma-backend
 	url = https://github.com/nickosevilla/plataforma-backend.git
