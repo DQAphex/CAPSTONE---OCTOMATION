@@ -1,6 +1,6 @@
 [submodule "Fase 2/Evidencias Proyecto/repos/billing"]
 	path = Fase 2/Evidencias Proyecto/repos/billing
-	url = git@github-trabajo:nickosevilla/billing-microservice.git
+	url = https://github.com/nickosevilla/billing-microservice.git
 [submodule "Fase 2/Evidencias Proyecto/repos/tenants"]
 	path = Fase 2/Evidencias Proyecto/repos/tenants
 	url = https://github.com/DQAphex/TenantsMicroservice.git
