@@ -19,6 +19,29 @@ export interface Workspace {
   role: UserRole;
 }
 
+export type MemberStatus = "ACTIVE" | "PENDING";
+
+export interface Member {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: MemberStatus;
+}
+
+export interface Permission {
+  label: string;
+  granted: boolean;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  membersCount: number;
+  permissions: Permission[];
+}
+
 export interface Subscription {
   id: string;
   planName: PlanName;

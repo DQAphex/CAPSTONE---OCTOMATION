@@ -8,22 +8,10 @@ import {
 } from "lucide-react";
 
 import { workspaces } from "@/lib/mock-data";
-import type { UserRole } from "@/types";
+import { roleLabels, roleStyles } from "@/lib/roles";
 
 export const metadata: Metadata = {
   title: "Mis Workspaces · OCTOMATION",
-};
-
-const roleLabels: Record<UserRole, string> = {
-  SUPER_ADMIN: "Super Admin",
-  TENANT_ADMIN: "Admin",
-  MEMBER: "Miembro",
-};
-
-const roleStyles: Record<UserRole, string> = {
-  SUPER_ADMIN: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
-  TENANT_ADMIN: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-  MEMBER: "border-octo-700 bg-octo-800 text-zinc-300",
 };
 
 const planLabels: Record<string, string> = {

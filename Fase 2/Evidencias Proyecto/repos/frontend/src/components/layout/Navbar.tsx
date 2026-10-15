@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 
+import { getInitials } from "@/lib/format";
 import { currentUser } from "@/lib/mock-data";
 import type { UserRole } from "@/types";
 import { getActiveNavItem } from "./nav-items";
@@ -16,15 +17,6 @@ const roleStyles: Record<UserRole, string> = {
   MEMBER:
     "border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-octo-700 dark:bg-octo-800 dark:text-zinc-300",
 };
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
-}
 
 export default function Navbar() {
   const pathname = usePathname();
