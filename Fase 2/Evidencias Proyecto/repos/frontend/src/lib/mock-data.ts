@@ -19,16 +19,9 @@ export const workspaces: Workspace[] = [
   },
   {
     id: "ws_02",
-    name: "Globex Labs",
-    slug: "globex-labs",
+    name: "Startup X",
+    slug: "startup-x",
     planId: "plan_starter",
-    role: "MEMBER",
-  },
-  {
-    id: "ws_03",
-    name: "Initech",
-    slug: "initech",
-    planId: "plan_enterprise",
     role: "MEMBER",
   },
 ];
@@ -39,8 +32,8 @@ export const subscription: Subscription = {
   status: "ACTIVE",
   price: 49,
   renewalDate: "2026-11-15",
-  usageAutomations: 1284,
-  maxAutomations: 5000,
+  usageAutomations: 450,
+  maxAutomations: 1000,
 };
 
 export const membersCount = 12;

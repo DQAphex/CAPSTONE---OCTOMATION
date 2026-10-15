@@ -44,7 +44,7 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, hint, icon: Icon }: MetricCardProps) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-octo-800 dark:bg-octo-900/50">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {title}
@@ -119,7 +119,7 @@ export default function DashboardPage() {
                 {usagePercent}% de{" "}
                 {numberFormat.format(subscription.maxAutomations)} este ciclo
               </span>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-octo-800">
                 <div
                   className="h-full rounded-full bg-zinc-900 dark:bg-zinc-100"
                   style={{ width: `${Math.min(usagePercent, 100)}%` }}
@@ -140,9 +140,9 @@ export default function DashboardPage() {
             <Link
               key={href}
               href={href}
-              className="group flex items-start gap-4 rounded-xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900"
+              className="group flex items-start gap-4 rounded-xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-octo-800 dark:bg-octo-900/50 dark:hover:border-octo-700 dark:hover:bg-octo-900"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-octo-800 dark:bg-octo-900">
                 <Icon className="size-5 text-zinc-700 dark:text-zinc-300" />
               </span>
               <span className="min-w-0 flex-1">

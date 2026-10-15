@@ -22,7 +22,7 @@ function WorkspaceSwitcher() {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-left text-sm transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800/70"
+        className="flex w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-left text-sm transition-colors hover:bg-zinc-50 dark:border-octo-800 dark:bg-octo-900 dark:hover:bg-octo-800/70"
       >
         <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-zinc-900 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
           {activeWorkspace.name.charAt(0)}
@@ -48,7 +48,7 @@ function WorkspaceSwitcher() {
           />
           <ul
             role="listbox"
-            className="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-lg border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+            className="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-lg border border-zinc-200 bg-white p-1 shadow-lg dark:border-octo-800 dark:bg-octo-900"
           >
             {workspaces.map((workspace) => {
               const selected = workspace.id === activeWorkspace.id;
@@ -60,9 +60,9 @@ function WorkspaceSwitcher() {
                       setActiveWorkspace(workspace);
                       setOpen(false);
                     }}
-                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-octo-800"
                   >
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded bg-zinc-200 text-[10px] font-semibold text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded bg-zinc-200 text-[10px] font-semibold text-zinc-700 dark:bg-octo-700 dark:text-zinc-200">
                       {workspace.name.charAt(0)}
                     </span>
                     <span className="flex-1 truncate">{workspace.name}</span>
@@ -88,7 +88,7 @@ export default function Sidebar() {
         type="button"
         onClick={() => setMobileOpen(true)}
         aria-label="Abrir menú"
-        className="fixed left-3 top-3 z-30 flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 lg:hidden dark:text-zinc-300 dark:hover:bg-zinc-800"
+        className="fixed left-3 top-3 z-30 flex size-10 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 lg:hidden dark:text-zinc-300 dark:hover:bg-octo-800"
       >
         <Menu className="size-5" />
       </button>
@@ -102,7 +102,7 @@ export default function Sidebar() {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-zinc-200 bg-zinc-50 transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 dark:border-zinc-800 dark:bg-zinc-950 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-zinc-200 bg-zinc-50 transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 dark:border-octo-800 dark:bg-octo-950 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -123,7 +123,7 @@ export default function Sidebar() {
             type="button"
             onClick={() => setMobileOpen(false)}
             aria-label="Cerrar menú"
-            className="flex size-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-200 lg:hidden dark:hover:bg-zinc-800"
+            className="flex size-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-200 lg:hidden dark:hover:bg-octo-800"
           >
             <X className="size-4" />
           </button>
@@ -147,8 +147,8 @@ export default function Sidebar() {
                 aria-current={active ? "page" : undefined}
                 className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                   active
-                    ? "bg-white font-medium text-zinc-900 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-800"
-                    : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-white font-medium text-zinc-900 shadow-sm ring-1 ring-zinc-200 dark:bg-octo-900 dark:text-zinc-100 dark:ring-octo-800"
+                    : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-octo-900 dark:hover:text-zinc-100"
                 }`}
               >
                 <Icon
@@ -160,7 +160,7 @@ export default function Sidebar() {
                 />
                 <span className="flex-1 truncate">{label}</span>
                 {tag && (
-                  <span className="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
+                  <span className="rounded border border-zinc-200 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400 dark:border-octo-800 dark:text-zinc-500">
                     {tag}
                   </span>
                 )}
@@ -169,7 +169,7 @@ export default function Sidebar() {
           })}
         </nav>
 
-        <div className="border-t border-zinc-200 p-4 text-xs text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
+        <div className="border-t border-zinc-200 p-4 text-xs text-zinc-400 dark:border-octo-800 dark:text-zinc-500">
           © OCTOMATION · v0.1.0
         </div>
       </aside>
