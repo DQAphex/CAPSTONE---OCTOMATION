@@ -15,4 +15,4 @@
 	url = https://github.com/DQAphex/OCTO-TRANSACTIONS.git
 [submodule "Fase 2/Evidencias Proyecto/repos/octomation-frontend"]
 	path = Fase 2/Evidencias Proyecto/repos/octomation-frontend
-	url = git@github-trabajo:DQAphex/octomation-frontend.git
+	url = https://github.com/DQAphex/octomation-frontend.git
