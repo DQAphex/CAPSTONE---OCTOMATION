@@ -10,3 +10,6 @@
 [submodule "Fase 2/Evidencias Proyecto/repos/plataforma-backend"]
 	path = Fase 2/Evidencias Proyecto/repos/plataforma-backend
 	url = https://github.com/nickosevilla/plataforma-backend.git
+[submodule "Fase 2/Evidencias Proyecto/repos/OCTO_TRANSACTIONS"]
+	path = Fase 2/Evidencias Proyecto/repos/OCTO_TRANSACTIONS
+	url = https://github.com/DQAphex/OCTO-TRANSACTIONS.git
