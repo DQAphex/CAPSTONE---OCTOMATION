@@ -1,0 +1,45 @@
+﻿title;summary;type.Element:Text;parent.Element:Text;priority.Element:Text;assignee.Element:Text;created;updated;due.Element:Text
+[OC-72] Listado de permisos;Listado de permisos;Subtask;OC-67;Medium;Denis Carcamo;22-10-2026 22:29;22-10-2026 22:29;
+[OC-71] Relacionar a usuario;Relacionar a usuario;Subtask;OC-67;Medium;Denis Carcamo;22-10-2026 22:03;22-10-2026 22:04;
+[OC-70] Deshabilitar;Deshabilitar;Subtask;OC-67;Medium;Denis Carcamo;22-10-2026 22:03;22-10-2026 22:03;
+[OC-69] Editar;Editar;Subtask;OC-67;Medium;Denis Carcamo;22-10-2026 22:03;22-10-2026 22:03;
+[OC-68] Añadir;Añadir;Subtask;OC-67;Medium;Denis Carcamo;22-10-2026 22:03;22-10-2026 22:03;
+[OC-67] Desarrollar Permisos;Desarrollar Permisos;Historia;OC-22;Medium;Denis Carcamo;22-10-2026 22:02;22-10-2026 22:48;
+[OC-66] Mapear todos los Puertos de cada componente;Mapear todos los Puertos de cada componente;Historia;;Medium;DIEGO LUIS QUIOZA GONZALEZ;22-10-2026 15:52;22-10-2026 15:54;
+[OC-65] EPIC-9: [BACKEND] Gestión de cobros;EPIC-9: [BACKEND] Gestión de cobros;Epic;;Medium;Denis Carcamo;08-10-2026 1:23;08-10-2026 1:23;
+[OC-64] EPIC-8: [FRONTEND] Visualización de planes y suscripciones ;EPIC-8: [FRONTEND] Visualización de planes y suscripciones ;Epic;;Medium;Denis Carcamo;08-10-2026 1:21;08-10-2026 1:22;
+[OC-63] Diseñar el Flujo;Diseñar el Flujo;Tarea;OC-61;Medium;DIEGO LUIS QUIOZA GONZALEZ;01-10-2026 21:48;01-10-2026 21:49;
+[OC-62] Investigación del proceso de transacción.;Investigación del proceso de transacción.;Tarea;OC-61;Medium;Santiago Ricardo Santander Vergara;01-10-2026 21:48;01-10-2026 21:51;
+[OC-61] EPIC-11: [Backend] Microservicio de transacciones;EPIC-11: [Backend] Microservicio de transacciones;Epic;;Medium;DIEGO LUIS QUIOZA GONZALEZ;01-10-2026 21:46;08-10-2026 1:16;Mon, 19 Oct 2026 00:00:00 +0000
+[OC-60] EPIC-10: [Frontend] Pasarela de pagos;EPIC-10: [Frontend] Pasarela de pagos;Epic;;Medium;Santiago Ricardo Santander Vergara;30-09-2026 0:10;30-09-2026 0:10;
+[OC-57] EPIC-7: [Frontend] Plataforma de Automatizaciones;EPIC-7: [Frontend] Plataforma de Automatizaciones;Epic;;Medium;DIEGO LUIS QUIOZA GONZALEZ;30-09-2026 0:09;30-09-2026 0:10;
+[OC-56] EPIC-6: [Frontend] Gestión de workspaces;EPIC-6: [Frontend] Gestión de workspaces;Epic;;Medium;DIEGO LUIS QUIOZA GONZALEZ;30-09-2026 0:09;30-09-2026 0:10;
+[OC-53] EPIC-5: [Backend] Plataforma de Automatizaciones;EPIC-5: [Backend] Plataforma de Automatizaciones;Epic;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:11;30-09-2026 0:02;Mon, 12 Oct 2026 00:00:00 +0000
+[OC-50] Documentar arquitectura y despliegue;Documentar arquitectura y despliegue;Tarea;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:05;01-10-2026 17:02;
+[OC-49] Integrar plataforma de automatizaciones;Integrar plataforma de automatizaciones;Historia;OC-53;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:05;01-10-2026 17:07;
+[OC-48] Integrar frontend y backend;Integrar frontend y backend;Historia;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 22:05;01-10-2026 17:06;
+[OC-47] Realizar pruebas de integración;Realizar pruebas de integración;Tarea;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:04;01-10-2026 17:07;
+[OC-46] Implementar pruebas de APIs;Implementar pruebas de APIs;Tarea;;Medium;Denis Carcamo;28-09-2026 22:04;01-10-2026 17:07;
+[OC-45] Crear pipeline CI/CD;Crear pipeline CI/CD;Tarea;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:04;01-10-2026 17:00;
+[OC-44] Dockerizar frontend;Dockerizar frontend;Tarea;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:04;01-10-2026 17:07;
+[OC-43] Dockerizar microservicios;Dockerizar microservicios;Tarea;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 22:04;01-10-2026 17:00;
+[OC-42] Implementar gestión de Workspaces en frontend;Implementar gestión de Workspaces en frontend;Historia;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 22:04;01-10-2026 17:06;
+[OC-41] Implementar gestión de usuarios en frontend;Implementar gestión de usuarios en frontend;Historia;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 22:04;01-10-2026 17:06;
+[OC-40] Implementar gestión de tenants en frontend;Implementar gestión de tenants en frontend;Historia;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 22:04;01-10-2026 17:06;
+[OC-33] HU-09: Actualización de Perfil;HU-09: Actualización de Perfil;Historia;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 21:58;01-10-2026 17:07;
+[OC-32] HU-8: Consulta y Listado de Usuarios;HU-8: Consulta y Listado de Usuarios;Historia;OC-53;Medium;Denis Carcamo;28-09-2026 21:45;01-10-2026 17:04;
+[OC-31] HU-7: Visualizar Dashboard Principal;HU-7: Visualizar Dashboard Principal;Historia;OC-24;Medium;Santiago Ricardo Santander Vergara;28-09-2026 17:08;01-10-2026 17:06;
+[OC-27] HU-2: Cambiar plan de suscripción;HU-2: Cambiar plan de suscripción;Historia;OC-21;Medium;Santiago Ricardo Santander Vergara;28-09-2026 17:03;01-10-2026 17:06;
+[OC-24] EPIC-4: [Frontend] Dashboard y Frontend;EPIC-4: [Frontend] Dashboard y Frontend;Epic;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 16:53;30-09-2026 0:02;Mon, 26 Oct 2026 00:00:00 +0000
+[OC-23] EPIC-3: [Backend] Gestión de Workspaces;EPIC-3: [Backend] Gestión de Workspaces;Epic;;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 16:53;30-09-2026 0:01;
+[OC-22] EPIC-2: [Backend] Sistema IAM;EPIC-2: [Backend] Sistema IAM;Epic;;Medium;Denis Carcamo;28-09-2026 16:53;30-09-2026 0:01;
+[OC-21] EPIC-1: [Backend] Motor de Facturación y Suscripciones.;EPIC-1: [Backend] Motor de Facturación y Suscripciones.;Epic;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 16:53;30-09-2026 0:02;Mon, 12 Oct 2026 00:00:00 +0000
+[OC-39] Crear estructura base del frontend;Crear estructura base del frontend;Tarea;;Medium;Santiago Ricardo Santander Vergara;28-09-2026 22:03;15-10-2026 17:41;
+[OC-25] HU-1: Ver estado de suscripción;HU-1: Ver estado de suscripción;Historia;OC-21;Medium;Santiago Ricardo Santander Vergara;28-09-2026 16:54;15-10-2026 17:41;
+[OC-55] HU-11: Asignación de Roles y Permisos;HU-11: Asignación de Roles y Permisos;Historia;OC-22;Medium;Denis Carcamo;29-09-2026 15:27;22-10-2026 0:23;
+[OC-52] HU-10: Deshabilitar Usuarios;HU-10: Deshabilitar Usuarios;Historia;OC-22;Medium;Denis Carcamo;28-09-2026 22:08;22-10-2026 0:23;
+[OC-34] Implementar gestión de grupos de trabajo;Implementar gestión de grupos de trabajo;Historia;OC-22;Medium;Denis Carcamo;28-09-2026 22:02;22-10-2026 0:23;
+[OC-30] HU-6: Invitar miembros al Workspace;HU-6: Invitar miembros al Workspace;Historia;OC-23;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 17:07;21-10-2026 21:34;
+[OC-29] HU-5: Crear un nuevo Workspace;HU-5: Crear un nuevo Workspace;Historia;OC-23;Medium;DIEGO LUIS QUIOZA GONZALEZ;28-09-2026 17:06;21-10-2026 19:50;
+[OC-28] HU-4: Registro de nuevo usuario (Sign Up);HU-4: Registro de nuevo usuario (Sign Up);Historia;OC-22;Medium;Denis Carcamo;28-09-2026 17:05;21-10-2026 23:41;
+[OC-26] HU-3: Iniciar sesión en la plataforma;HU-3: Iniciar sesión en la plataforma;Historia;OC-22;Medium;Denis Carcamo;28-09-2026 17:01;22-10-2026 22:02;
