@@ -16,3 +16,6 @@
 [submodule "Fase 2/Evidencias Proyecto/repos/octomation-frontend"]
 	path = Fase 2/Evidencias Proyecto/repos/octomation-frontend
 	url = https://github.com/DQAphex/octomation-frontend.git
+[submodule "Fase 2/Evidencias Proyecto/repos/Octomation-Engine-Server"]
+	path = Fase 2/Evidencias Proyecto/repos/Octomation-Engine-Server
+	url = https://github.com/DQAphex/Octomation-Engine-server.git
