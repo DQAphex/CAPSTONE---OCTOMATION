@@ -22,3 +22,9 @@
 [submodule "Fase 2/Evidencias Proyecto/repos/Octomation-Engine-Client"]
 	path = Fase 2/Evidencias Proyecto/repos/Octomation-Engine-Client
 	url = https://github.com/DQAphex/Octomation-Engine-Client.git
+[submodule "Fase 2/Evidencias Proyecto/repos/plugins"]
+	path = Fase 2/Evidencias Proyecto/repos/plugins
+	url = https://github.com/DQAphex/plugins_ms.git
+[submodule "Fase 2/Evidencias Proyecto/repos/plugin_generator"]
+	path = Fase 2/Evidencias Proyecto/repos/plugin_generator
+	url = https://github.com/DQAphex/plugin_generator.git
