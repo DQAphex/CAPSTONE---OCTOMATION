@@ -1,0 +1,525 @@
+﻿diff --git a/src/app/dashboard/layout.tsx b/src/app/dashboard/layout.tsx
+index d9f5387..e139373 100644
+--- a/src/app/dashboard/layout.tsx
++++ b/src/app/dashboard/layout.tsx
+@@ -1,14 +1,36 @@
++import { Suspense } from "react";
++
+ import Navbar from "@/components/layout/Navbar";
+ import Sidebar from "@/components/layout/Sidebar";
+ 
+ export default function DashboardLayout({
+   children,
+-}: { children: React.ReactNode }) {
++}: {
++  children: React.ReactNode;
++}) {
+   return (
+     <div className="flex min-h-screen w-full bg-white dark:bg-octo-950">
+-      <Sidebar />
++      <Suspense
++        fallback={
++          <div
++            aria-hidden="true"
++            className="hidden w-64 shrink-0 lg:block"
++          />
++        }
++      >
++        <Sidebar />
++      </Suspense>
+       <div className="flex min-w-0 flex-1 flex-col">
+-        <Navbar />
++        <Suspense
++          fallback={
++            <div
++              aria-hidden="true"
++              className="h-16 border-b border-zinc-200 dark:border-octo-800"
++            />
++          }
++        >
++          <Navbar />
++        </Suspense>
+         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+           <div className="mx-auto w-full max-w-6xl">{children}</div>
+         </main>
+diff --git a/src/app/dashboard/workspaces/page.tsx b/src/app/dashboard/workspaces/page.tsx
+index f663889..1b9b76a 100644
+--- a/src/app/dashboard/workspaces/page.tsx
++++ b/src/app/dashboard/workspaces/page.tsx
+@@ -88,7 +88,7 @@ export default function WorkspacesPage() {
+     try {
+       const result = await listWorkspaces(signal);
+ 
+-      if (result.aborted) return;
++      if (!result.ok && result.aborted) return;
+       if (!result.ok) {
+         setError(result.error);
+         return;
+diff --git a/src/app/login/page.tsx b/src/app/login/page.tsx
+index 3f432cb..dee7400 100644
+--- a/src/app/login/page.tsx
++++ b/src/app/login/page.tsx
+@@ -33,7 +33,10 @@ function decodeTokenPayload(token: string): Record<string, unknown> {
+   }
+ 
+   try {
+-    const base64 = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
++    const base64 = encodedPayload
++      .replace(/-/g, "+")
++      .replace(/_/g, "/")
++      .padEnd(Math.ceil(encodedPayload.length / 4) * 4, "=");
+     const bytes = Uint8Array.from(atob(base64), (character) =>
+       character.charCodeAt(0),
+     );
+@@ -100,6 +103,11 @@ function getLoginError(error: unknown): string {
+ }
+ 
+ function getRole(payload: Record<string, unknown>): UserRole | undefined {
++  const singleRole = userRoles.find((candidate) => candidate === payload.role);
++  if (singleRole) {
++    return singleRole;
++  }
++
+   if (!Array.isArray(payload.roles)) {
+     return undefined;
+   }
+@@ -117,9 +125,9 @@ function getRole(payload: Record<string, unknown>): UserRole | undefined {
+ async function findUserWorkspace(
+   userId: string,
+   accessToken: string,
+-): Promise<{ tenantId: string; workspaceName: string }> {
++): Promise<{ tenantId: string; workspaceName: string } | null> {
+   const memberResponse = await fetch(
+-    `${TENANT_URL}/members/by-iam-user/${encodeURIComponent(userId)}`,
++    `${TENANT_URL}/members/data/iam-user/${encodeURIComponent(userId)}`,
+     {
+       headers: { Authorization: `Bearer ${accessToken}` },
+       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+@@ -127,6 +135,10 @@ async function findUserWorkspace(
+   );
+   const memberBody = await getResponseBody(memberResponse);
+ 
++  if (memberResponse.status === 404) {
++    return null;
++  }
++
+   if (!memberResponse.ok) {
+     throw new Error(
+       getErrorMessage(memberBody) ||
+@@ -134,22 +146,19 @@ async function findUserWorkspace(
+     );
+   }
+ 
+-  const memberships = Array.isArray(memberBody)
+-    ? memberBody
+-    : isRecord(memberBody) && Array.isArray(memberBody.data)
++  const membership = Array.isArray(memberBody)
++    ? memberBody.find(
++        (item): item is Record<string, unknown> =>
++          isRecord(item) && typeof item.tenantId === "string",
++      )
++    : isRecord(memberBody) && isRecord(memberBody.data)
+       ? memberBody.data
+       : isRecord(memberBody)
+-        ? [memberBody]
+-        : [];
+-  const membership = memberships.find(
+-    (item): item is Record<string, unknown> =>
+-      isRecord(item) && typeof item.tenantId === "string",
+-  );
++        ? memberBody
++        : null;
+ 
+   if (!membership || typeof membership.tenantId !== "string") {
+-    throw new Error(
+-      "Esta cuenta todav├¡a no tiene una empresa asociada. Completa el registro de la empresa o contacta soporte.",
+-    );
++    return null;
+   }
+ 
+   const tenantResponse = await fetch(
+@@ -209,11 +218,23 @@ export default function LoginPage() {
+         );
+       }
+ 
+-      if (!isRecord(body) || typeof body.access_token !== "string") {
++      if (!isRecord(body)) {
++        throw new Error("IAM devolvi├│ una respuesta de inicio inv├ílida.");
++      }
++
++      const accessToken = [
++        body.access_token,
++        body.accessToken,
++        body.token,
++      ].find(
++        (value): value is string =>
++          typeof value === "string" && value.length > 0,
++      );
++
++      if (!accessToken) {
+         throw new Error("IAM devolvi├│ una respuesta de inicio inv├ílida.");
+       }
+ 
+-      const accessToken = body.access_token;
+       const claims = decodeTokenPayload(accessToken);
+       const previousUser = readSessionUser();
+       const previousUserMatches =
+@@ -221,9 +242,11 @@ export default function LoginPage() {
+       const id =
+         typeof claims.sub === "string"
+           ? claims.sub
+-          : previousUserMatches
+-            ? previousUser.id
+-            : null;
++          : typeof claims.id === "string"
++            ? claims.id
++            : previousUserMatches
++              ? previousUser.id
++              : null;
+ 
+       if (!id) {
+         throw new Error("IAM no devolvi├│ el identificador de esta cuenta.");
+@@ -235,10 +258,7 @@ export default function LoginPage() {
+           : previousUserMatches
+             ? previousUser.name
+             : email;
+-      const { tenantId, workspaceName } = await findUserWorkspace(
+-        id,
+-        accessToken,
+-      );
++      const workspace = await findUserWorkspace(id, accessToken);
+       const sessionUser: SessionUser = {
+         id,
+         name,
+@@ -249,8 +269,12 @@ export default function LoginPage() {
+           : previousUserMatches && previousUser.role
+             ? { role: previousUser.role }
+             : {}),
+-        tenantId,
+-        workspaceName,
++        ...(workspace
++          ? {
++              tenantId: workspace.tenantId,
++              workspaceName: workspace.workspaceName,
++            }
++          : {}),
+       };
+ 
+       try {
+@@ -269,7 +293,7 @@ export default function LoginPage() {
+         );
+       }
+ 
+-      router.push("/dashboard");
++      router.push(workspace ? "/dashboard" : "/onboarding");
+     } catch (error: unknown) {
+       setErrorMessage(getLoginError(error));
+     } finally {
+diff --git a/src/app/onboarding/page.tsx b/src/app/onboarding/page.tsx
+index f15ee7f..aabb530 100644
+--- a/src/app/onboarding/page.tsx
++++ b/src/app/onboarding/page.tsx
+@@ -1,33 +1,127 @@
+ "use client";
+ 
+-import { useState, type FormEvent } from "react";
++import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
++import Link from "next/link";
+ import { useRouter } from "next/navigation";
+ import { Building2, LoaderCircle, TriangleAlert } from "lucide-react";
+ 
+ import AuthCard from "@/components/auth/AuthCard";
++import {
++  notifySessionUpdated,
++  useSessionUser,
++  type SessionUser,
++} from "@/lib/session";
+ 
+ const TENANTS_URL =
+   process.env.NEXT_PUBLIC_TENANTS_URL ?? "http://localhost:4004";
+ 
+ const TENANT_ID_KEY = "current_tenant_id";
++const PENDING_TENANT_KEY = "pending_onboarding_tenant";
++const REQUEST_TIMEOUT_MS = 15_000;
+ 
+-interface CreatedTenant {
+-  tenantId?: string;
+-  tenant_id?: string;
+-  id?: string;
++function subscribeToNothing(): () => void {
++  return () => {};
+ }
+ 
+-function getTenantId(body: CreatedTenant): string | null {
++function useIsClient(): boolean {
++  return useSyncExternalStore(
++    subscribeToNothing,
++    () => true,
++    () => false,
++  );
++}
++
++interface PendingTenant {
++  tenantId: string;
++  name: string;
++}
++
++function isRecord(value: unknown): value is Record<string, unknown> {
++  return typeof value === "object" && value !== null && !Array.isArray(value);
++}
++
++function getTenantId(body: Record<string, unknown>): string | undefined {
+   const id = body.tenantId ?? body.tenant_id ?? body.id;
+-  return typeof id === "string" && id.length > 0 ? id : null;
++  return typeof id === "string" && id.length > 0 ? id : undefined;
++}
++
++function readPendingTenant(): PendingTenant | null {
++  try {
++    const value: unknown = JSON.parse(
++      localStorage.getItem(PENDING_TENANT_KEY) ?? "null",
++    );
++    if (
++      isRecord(value) &&
++      typeof value.tenantId === "string" &&
++      typeof value.name === "string"
++    ) {
++      return { tenantId: value.tenantId, name: value.name };
++    }
++  } catch {
++    // Ignorar datos corruptos y volver a crear la empresa.
++  }
++  return null;
++}
++
++function getInitialCompanyName(): string {
++  if (typeof window === "undefined") {
++    return "";
++  }
++  return readPendingTenant()?.name ?? "";
++}
++
++function writePendingTenant(pending: PendingTenant): void {
++  localStorage.setItem(PENDING_TENANT_KEY, JSON.stringify(pending));
++}
++
++async function readResponseBody(response: Response): Promise<unknown> {
++  const text = await response.text();
++  if (!text) {
++    return null;
++  }
++
++  try {
++    return JSON.parse(text) as unknown;
++  } catch {
++    return text;
++  }
++}
++
++function getApiErrorMessage(body: unknown): string | undefined {
++  if (typeof body === "string") {
++    return body;
++  }
++
++  if (!isRecord(body)) {
++    return undefined;
++  }
++
++  const message = body.message ?? body.error;
++  if (typeof message === "string") {
++    return message;
++  }
++
++  if (Array.isArray(message)) {
++    return message.map(String).join(", ");
++  }
++
++  return undefined;
+ }
+ 
+ export default function OnboardingPage() {
+   const router = useRouter();
+-  const [companyName, setCompanyName] = useState("");
++  const isClient = useIsClient();
++  const user = useSessionUser();
++  const [companyName, setCompanyName] = useState(getInitialCompanyName);
+   const [isLoading, setIsLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+ 
++  useEffect(() => {
++    if (user?.tenantId) {
++      router.replace("/dashboard");
++    }
++  }, [user, router]);
++
+   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+     event.preventDefault();
+     const name = companyName.trim();
+@@ -37,48 +131,136 @@ export default function OnboardingPage() {
+       return;
+     }
+ 
++    if (!user) {
++      router.replace("/login");
++      return;
++    }
++
++    const token = localStorage.getItem("token");
++    if (!token) {
++      router.replace("/login");
++      return;
++    }
++
+     setIsLoading(true);
+     setError(null);
+ 
++    let pending = readPendingTenant();
++    let tenantId = pending?.tenantId;
++
+     try {
+-      const res = await fetch(`${TENANTS_URL}/tenants`, {
++      if (!tenantId) {
++        const res = await fetch(`${TENANTS_URL}/tenants`, {
++          method: "POST",
++          headers: {
++            "Content-Type": "application/json",
++            Authorization: `Bearer ${token}`,
++          },
++          body: JSON.stringify({
++            name,
++            rut: 0,
++            dv: "0",
++            type: "EMPRESA",
++          }),
++          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
++        });
++        const body = await readResponseBody(res);
++
++        if (!res.ok) {
++          throw new Error(
++            getApiErrorMessage(body) ||
++              `Error ${res.status} al registrar la empresa`,
++          );
++        }
++
++        if (!isRecord(body)) {
++          throw new Error("La API no devolvi├│ la empresa creada");
++        }
++
++        tenantId = getTenantId(body);
++        if (!tenantId) {
++          throw new Error("La API no devolvi├│ el identificador del tenant");
++        }
++
++        pending = { tenantId, name };
++        writePendingTenant(pending);
++      }
++
++      const memberRes = await fetch(`${TENANTS_URL}/members`, {
+         method: "POST",
+-        headers: { "Content-Type": "application/json" },
++        headers: {
++          "Content-Type": "application/json",
++          Authorization: `Bearer ${token}`,
++        },
+         body: JSON.stringify({
+-          name,
+-          rut: 0,
+-          dv: "0",
+-          type: "EMPRESA",
++          iamUserId: user.id,
++          tenantId,
+         }),
++        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+       });
++      const memberBody = await readResponseBody(memberRes);
+ 
+-      if (!res.ok) {
+-        throw new Error(`Error ${res.status} al registrar la empresa`);
++      if (!memberRes.ok) {
++        throw new Error(
++          getApiErrorMessage(memberBody) ||
++            `Error ${memberRes.status} al asociar tu cuenta a la empresa`,
++        );
+       }
+ 
+-      const tenant = (await res.json()) as CreatedTenant;
+-      const tenantId = getTenantId(tenant);
+-
+-      if (!tenantId) {
+-        throw new Error("La API no devolvi├│ el identificador del tenant");
+-      }
++      const sessionUser: SessionUser = {
++        ...user,
++        tenantId,
++        workspaceName: name,
++      };
+ 
++      localStorage.setItem("user", JSON.stringify(sessionUser));
+       localStorage.setItem(TENANT_ID_KEY, tenantId);
+-      router.push("/dashboard/workspaces");
++      localStorage.removeItem(PENDING_TENANT_KEY);
++      notifySessionUpdated();
++      router.push("/dashboard");
+     } catch (err: unknown) {
+-      setError(
++      const requestError =
+         err instanceof Error
+           ? err.message
+-          : "No se pudo registrar la empresa",
++          : "No se pudo registrar la empresa";
++      setError(
++        pending
++          ? `${requestError} La empresa ya fue creada; vuelve a intentarlo para asociar tu cuenta.`
++          : requestError,
+       );
+       setIsLoading(false);
+     }
+   }
+ 
++  if (!isClient) {
++    return null;
++  }
++
++  if (!user) {
++    return (
++      <AuthCard
++        title="Inicia sesi├│n"
++        subtitle="Necesitas una sesi├│n activa para registrar tu empresa."
++        footer="Si a├║n no tienes cuenta, puedes crearla en el registro."
++      >
++        <Link
++          href="/login"
++          className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-violet-600 text-sm font-medium text-white shadow-lg shadow-violet-600/25 transition-colors hover:bg-violet-500"
++        >
++          Ir a iniciar sesi├│n
++        </Link>
++      </AuthCard>
++    );
++  }
++
++  if (user.tenantId) {
++    return null;
++  }
++
+   return (
+     <AuthCard
+       title="Registra tu empresa"
+-      subtitle="Crea el espacio de tu organizaci├│n para empezar a usar OCTOMATION."
++      subtitle="Tu cuenta a├║n no tiene una empresa asociada. Crea el espacio de tu organizaci├│n para empezar a usar OCTOMATION."
+       footer="Podr├ís invitar a tu equipo desde el dashboard."
+     >
+       <form onSubmit={handleSubmit} className="space-y-4">
+diff --git a/src/app/register/page.tsx b/src/app/register/page.tsx
+index ab38510..920625b 100644
+--- a/src/app/register/page.tsx
++++ b/src/app/register/page.tsx
+@@ -190,7 +190,7 @@ export default function RegisterPage() {
+ 
+       const accessToken = getRequiredString(
+         loginBody,
+-        ["access_token", "accessToken"],
++        ["access_token", "accessToken", "token"],
+         "el token de acceso"
+       );
+ 

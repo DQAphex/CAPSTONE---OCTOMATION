@@ -1,0 +1,7 @@
+# Entorno local de Docker Compose (no se versiona)
+.env
+.env.*
+!.env.example
+
+# Archivos de datos generados localmente
+docker/postgres/data/
