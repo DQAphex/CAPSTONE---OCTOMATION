@@ -28,3 +28,8 @@
 [submodule "Fase 2/Evidencias Proyecto/repos/plugin_generator"]
 	path = Fase 2/Evidencias Proyecto/repos/plugin_generator
 	url = https://github.com/DQAphex/plugin_generator.git
+
+	
+[submodule "Fase 2/Evidencias Proyecto/repos/Octomation-Desktop"]
+	path = Fase 2/Evidencias Proyecto/repos/Octomation-Desktop
+	url = https://github.com/DQAphex/Octomation-Desktop

@@ -1,0 +1,356 @@
+name: octomation
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL: instancia unica con una base de datos logica por microservicio.
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Define POSTGRES_USER en el archivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en el archivo .env}
+      POSTGRES_DB: postgres
+    ports:
+      # Acceso opcional desde herramientas locales (DBeaver, psql, etc.).
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-databases.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+    healthcheck:
+      # -h 127.0.0.1 fuerza TCP: durante la inicializacion PostgreSQL solo
+      # escucha por socket Unix, por lo que el healthcheck no pasa antes de
+      # que los scripts de init hayan terminado.
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -p 5432 -U \"$$POSTGRES_USER\" -d postgres && for db in iam_db tenant_db billing_db transactions_db plugins_db; do psql -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$db\" -tAc 'SELECT 1' >/dev/null || exit 1; done",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - octomation-network
+
+  # ---------------------------------------------------------------------------
+  # Migraciones / inicializacion de esquemas.
+  # Cada servicio espera a PostgreSQL healthy y completa antes de que su API
+  # arranque (depends_on: condition: service_completed_successfully).
+  # ---------------------------------------------------------------------------
+  billing-migrate:
+    build:
+      context: .
+      dockerfile: docker/billing/Dockerfile
+      target: migrate
+    image: octomation/billing:migrate
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/billing_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - octomation-network
+
+  iam-migrate:
+    build:
+      context: .
+      dockerfile: docker/iam/Dockerfile
+      target: migrate
+    image: octomation/iam:migrate
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/iam_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - octomation-network
+
+  tenants-migrate:
+    build:
+      context: .
+      dockerfile: docker/tenants/Dockerfile
+      target: migrate
+    image: octomation/tenants:migrate
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/tenant_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - octomation-network
+
+  plugins-migrate:
+    build:
+      context: .
+      dockerfile: docker/plugins/Dockerfile
+      target: migrate
+    image: octomation/plugins:migrate
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/plugins_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - octomation-network
+
+  # ---------------------------------------------------------------------------
+  # Microservicios.
+  # ---------------------------------------------------------------------------
+  billing:
+    build:
+      context: .
+      dockerfile: docker/billing/Dockerfile
+      target: runner
+    image: octomation/billing:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "4001"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/billing_db
+    ports:
+      - "${BILLING_PORT:-4001}:4001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      billing-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(4001,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - octomation-network
+
+  iam:
+    build:
+      context: .
+      dockerfile: docker/iam/Dockerfile
+      target: runner
+    image: octomation/iam:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "4002"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/iam_db
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el archivo .env}
+    ports:
+      - "${IAM_PORT:-4002}:4002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      iam-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(4002,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - octomation-network
+
+  tenants:
+    build:
+      context: .
+      dockerfile: docker/tenants/Dockerfile
+      target: runner
+    image: octomation/tenants:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "4004"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/tenant_db
+      # Comunicacion interna por DNS de Docker (nunca localhost).
+      IAM_URL: ${IAM_INTERNAL_URL:-http://iam:4002}
+    ports:
+      - "${TENANTS_PORT:-4004}:4004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      tenants-migrate:
+        condition: service_completed_successfully
+      iam:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(4004,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - octomation-network
+
+  plugins:
+    build:
+      context: .
+      dockerfile: docker/plugins/Dockerfile
+      target: runner
+    image: octomation/plugins:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "4005"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/plugins_db
+    ports:
+      - "${PLUGINS_PORT:-4005}:4005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      plugins-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(4005,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - octomation-network
+
+  # OCTO_TRANSACTIONS: aplicacion Express/Webpay. No usa PostgreSQL en el
+  # codigo actual, pero se conecta a la red y espera a PostgreSQL para cumplir
+  # el orden de inicializacion comun de la plataforma.
+  transactions:
+    build:
+      context: .
+      dockerfile: docker/transactions/Dockerfile
+    image: octomation/transactions:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "4003"
+      BASE_URL: ${TRANSACTIONS_BASE_URL:-http://localhost:4003}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/transactions_db
+      TBK_ENV: ${TBK_ENV:-integration}
+      TBK_COMMERCE_CODE: ${TBK_COMMERCE_CODE:-}
+      TBK_CHILD_CODE: ${TBK_CHILD_CODE:-}
+      TBK_API_KEY: ${TBK_API_KEY:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      ADMIN_USER: ${ADMIN_USER:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "${TRANSACTIONS_PORT:-4003}:4003"
+    volumes:
+      # Persistencia del registro de pedidos (data/pedidos.json).
+      - transactions_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(4003,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - octomation-network
+
+  # ---------------------------------------------------------------------------
+  # Frontend web (Next.js). Las URL NEXT_PUBLIC_* se usan desde el navegador,
+  # por eso apuntan a localhost:<puerto-host>, no al DNS interno de Docker.
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_BILLING_URL: ${NEXT_PUBLIC_BILLING_URL:-http://localhost:4001}
+        NEXT_PUBLIC_IAM_SERVICE_URL: ${NEXT_PUBLIC_IAM_SERVICE_URL:-http://localhost:4002}
+        NEXT_PUBLIC_TRANSACTIONS_URL: ${NEXT_PUBLIC_TRANSACTIONS_URL:-http://localhost:4003}
+        NEXT_PUBLIC_TENANTS_URL: ${NEXT_PUBLIC_TENANTS_URL:-http://localhost:4004}
+        NEXT_PUBLIC_PLUGINS_URL: ${NEXT_PUBLIC_PLUGINS_URL:-http://localhost:4005}
+    image: octomation/frontend:latest
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      billing:
+        condition: service_healthy
+      iam:
+        condition: service_healthy
+      tenants:
+        condition: service_healthy
+      plugins:
+        condition: service_healthy
+      transactions:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const s=net.connect(3000,'127.0.0.1',()=>{s.destroy();process.exit(0)});s.on('error',()=>process.exit(1));s.setTimeout(3000,()=>{s.destroy();process.exit(1)});",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - octomation-network
+
+volumes:
+  postgres_data:
+    name: octomation-postgres-data
+  transactions_data:
+    name: octomation-transactions-data
+
+networks:
+  octomation-network:
+    name: octomation-network
+    driver: bridge

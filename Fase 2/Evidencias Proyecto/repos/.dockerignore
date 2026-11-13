@@ -1,0 +1,29 @@
+# Archivos locales con secretos
+.env
+.env.*
+!.env.example
+
+# Artefactos de build y dependencias (el contexto de Docker no los necesita)
+**/node_modules
+**/dist
+**/.next
+**/coverage
+**/venv
+**/__pycache__
+**/*.tsbuildinfo
+**/*.log
+
+# Metadatos de Git
+**/.git
+**/.gitignore
+**/.gitattributes
+
+# Repositorios que no forman parte de esta infraestructura Docker
+Octomation-Engine-Client
+Octomation-Engine-Server
+plugin_generator
+
+# Documentacion/esquema consolidado que no se copia a las imagenes
+plataforma-backend
+SCHEMAS_MICROSERVICIOS.md
+database_schema.sql
